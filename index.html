@@ -9,7 +9,7 @@
   --opp:#c2570c; --opp-soft:#fbe9db;
   --arab:#0f7a55; --arab-soft:#d9f1e7;
   --good:#0f7a55; --warn:#b4540a; --bad:#b3261e;
-  --maj:#14182b;
+  --maj:#14182b; --c1:#2b3a5e; --c2:#7a8499; --c3:#c3c8d6;
   --f-disp:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;
   --f-body:"IBM Plex Sans",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,monospace;
@@ -19,13 +19,13 @@
   --right:#7c9bff; --right-soft:#1d2a55;
   --opp:#f0924d; --opp-soft:#4a2a12;
   --arab:#4fcf9c; --arab-soft:#123d2d;
-  --good:#4fcf9c; --warn:#f0a35c; --bad:#ff8b82; --maj:#eceef6; color-scheme:dark}}
+  --good:#4fcf9c; --warn:#f0a35c; --bad:#ff8b82; --maj:#eceef6; --c1:#9fb0e0; --c2:#6c7690; --c3:#3a4260; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e111c; --panel:#171b2a; --fg:#eceef6; --muted:#9aa2b8; --line:#2a3046;
   --right:#7c9bff; --right-soft:#1d2a55;
   --opp:#f0924d; --opp-soft:#4a2a12;
   --arab:#4fcf9c; --arab-soft:#123d2d;
-  --good:#4fcf9c; --warn:#f0a35c; --bad:#ff8b82; --maj:#eceef6; color-scheme:dark}
+  --good:#4fcf9c; --warn:#f0a35c; --bad:#ff8b82; --maj:#eceef6; --c1:#9fb0e0; --c2:#6c7690; --c3:#3a4260; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;
   padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -84,7 +84,23 @@ h1{font-family:var(--f-disp);font-weight:700;font-size:28px;letter-spacing:-.01e
 .add input[name=n]{flex:2 1 140px}.add input[name=s]{flex:0 0 80px}.add select{flex:1 1 120px}
 .add button{font:600 14px var(--f-body);background:var(--fg);color:var(--bg);border:0;border-radius:6px;padding:8px 14px;cursor:pointer}
 .foot{margin-top:18px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-html{background:var(--bg)}body{margin:0}</style></head><body>
+html{background:var(--bg)}body{margin:0}
+.demo{margin-top:30px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.demo h2{font:600 19px var(--f-disp);margin:0 0 4px}
+.demo h3{font:600 14px var(--f-disp);margin:18px 0 6px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.demo .dsub{margin:0 0 12px;color:var(--muted);font-size:13px}
+.dbar{display:flex;height:26px;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.dbar i{display:block;height:100%}
+.dtab{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.dtab th,.dtab td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.dtab th{font:500 12px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.dtab td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dtab th.n{text-align:right}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;vertical-align:baseline}
+.tw{overflow-x:auto}
+.demo ul{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--muted);display:grid;gap:6px}
+.demo a{color:var(--right)}
+</style></head><body>
 <div class="banner"><div class="bin"><img class="logo" alt="Centile Partners" src="data:image/png;base64,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"><span class="bname">CENTILE <b>PARTNERS</b></span><span class="bsrc">Source: CEC, press reports</span></div></div>
 <div class="wrap">
 <header>
@@ -112,6 +128,33 @@ html{background:var(--bg)}body{margin:0}</style></head><body>
   <p>Seats are the Central Elections Committee figures reported on 28 Oct (Times of Israel, Jerusalem Post, Ynet). About 430,000 to 480,000 double-envelope ballots (soldiers, prisoners, diplomats) were still to be counted from early Thursday. The CEC is expected to publish final official results on 4 November. Use the − and + buttons to change a party's seats as the count moves.</p>
   <p>Flags show public statements reported after the vote, not formal positions: Eisenkot has rejected serving under Netanyahu, and every Zionist-bloc party except The Democrats has ruled out relying on Ra'am or the Joint List. Parties can and do change course in coalition talks. Under Israeli law the president picks the member best placed to form a government, who then has 28 days, extendable by 14.</p>
 </div>
+<section class="demo" id="demo">
+<h2>Who lives in Israel</h2>
+<p class="dsub">Official population by group, Central Bureau of Statistics (CBS), eve of Independence Day 2026: 10.244 million people. Preliminary, as of 22 April 2026, and based on the 2022 census.</p>
+<div class="dbar" role="img" aria-label="Jews and others 76.0%, Arabs 21.1%, foreigners 2.9%"><i style="width:76.0%;background:var(--c1)"></i><i style="width:21.1%;background:var(--c2)"></i><i style="width:2.9%;background:var(--c3)"></i></div>
+<div class="tw"><table class="dtab">
+<tr><th>Population group</th><th class="n">People</th><th class="n">Share</th></tr>
+<tr><td><span class="sw" style="background:var(--c1)"></span>Jews and others</td><td class="n">7.790 m</td><td class="n">76.0%</td></tr>
+<tr><td><span class="sw" style="background:var(--c2)"></span>Arabs (Muslims, Arab Christians, Druze)</td><td class="n">2.157 m</td><td class="n">21.1%</td></tr>
+<tr><td><span class="sw" style="background:var(--c3)"></span>Foreigners (end of 2025)</td><td class="n">296,000</td><td class="n">2.9%</td></tr>
+</table></div>
+<h3>Religion</h3>
+<div class="tw"><table class="dtab">
+<tr><th>Group</th><th class="n">People</th><th class="n">Share</th></tr>
+<tr><td>Jews<br><small>CBS Independence Day 2024, the last release that separates them. Based on the 2008 census, excludes foreign workers.</small></td><td class="n">7.427 m</td><td class="n">73.2%</td></tr>
+<tr><td>Others (non-Arab Christians, other religions, not classified)<br><small>Same 2024 release.</small></td><td class="n">564,000</td><td class="n">5.7%</td></tr>
+<tr><td>Arabs<br><small>Same 2024 release.</small></td><td class="n">2.089 m</td><td class="n">21.1%</td></tr>
+<tr><td>Christians<br><small>CBS Christmas 2025 release, 24 Dec 2025. 78.7% are Arab Christians.</small></td><td class="n">about 184,200</td><td class="n">1.9%</td></tr>
+<tr><td>Muslims<br><small>Press report, May 2026. I could not confirm it in a CBS release.</small></td><td class="n">about 1.85 m</td><td class="n">n/a</td></tr>
+</table></div>
+<ul>
+<li>CBS does not classify people by race. Its categories are population group (Jews and others, Arabs, foreigners) and religion.</li>
+<li>"Others" are mostly immigrants under the Law of Return and family members who are not defined as Jews in the Population Register.</li>
+<li>Population share is not electorate share. The Arab parties won 19 of 120 seats (15.8%) against an Arab population share of 21.1%, and the CBS Arab figure includes residents who cannot vote in Knesset elections.</li>
+<li>CBS has not published a Jews-versus-others split on the 2022 census basis in the releases I found, so the Jews row dates from 2024 and the 2008 basis.</li>
+</ul>
+<p class="dsub" style="margin-top:12px">Sources: <a href="https://www.cbs.gov.il/he/mediarelease/DocLib/2026/117/11_26_117e.pdf">CBS, Independence Day 2026</a> · <a href="https://www.cbs.gov.il/he/mediarelease/doclib/2024/141/11_24_141e.pdf">CBS, Independence Day 2024</a> · <a href="https://www.cbs.gov.il/he/mediarelease/DocLib/2025/413/11_25_413e.pdf">CBS, Christmas 2025</a> · <a href="https://www.jns.org/news/israel-news/israels-muslim-population-reaches-1-85-million-ahead-of-eid-al-adha">JNS, Muslim population</a></p>
+</section>
 <section class="add"><h2>Add a party</h2><form id="addf"><input name="n" aria-label="Party name" placeholder="Party name" required maxlength="40"><input name="s" aria-label="Seats" type="number" min="0" max="120" value="4" required><select name="b" aria-label="Bloc"><option value="r">Netanyahu bloc</option><option value="o">Opposition bloc</option><option value="a">Arab parties</option></select><button type="submit">Add</button></form></section>
 <div class="foot"><span>Seats: CEC count at 89.8%, 28 Oct 2026. Final results due 4 Nov.</span><span>Source: CEC, press reports</span></div>
 </div>
