@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Knesset Coalition Builder</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky seat tally on top, three bloc groups of toggle rows below, presets as chips. */
+:root{
+  --bg:#f3f4f7; --panel:#ffffff; --fg:#14182b; --muted:#5d6479; --line:#d9dce6;
+  --right:#1f4fd8; --right-soft:#e3eafc;
+  --opp:#c2570c; --opp-soft:#fbe9db;
+  --arab:#0f7a55; --arab-soft:#d9f1e7;
+  --good:#0f7a55; --warn:#b4540a; --bad:#b3261e;
+  --maj:#14182b;
+  --f-disp:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e111c; --panel:#171b2a; --fg:#eceef6; --muted:#9aa2b8; --line:#2a3046;
+  --right:#7c9bff; --right-soft:#1d2a55;
+  --opp:#f0924d; --opp-soft:#4a2a12;
+  --arab:#4fcf9c; --arab-soft:#123d2d;
+  --good:#4fcf9c; --warn:#f0a35c; --bad:#ff8b82; --maj:#eceef6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e111c; --panel:#171b2a; --fg:#eceef6; --muted:#9aa2b8; --line:#2a3046;
+  --right:#7c9bff; --right-soft:#1d2a55;
+  --opp:#f0924d; --opp-soft:#4a2a12;
+  --arab:#4fcf9c; --arab-soft:#123d2d;
+  --good:#4fcf9c; --warn:#f0a35c; --bad:#ff8b82; --maj:#eceef6; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:760px;margin:0 auto}
+header{padding-block:20px 12px}
+h1{font-family:var(--f-disp);font-weight:700;font-size:28px;letter-spacing:-.01em;margin:0 0 4px;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:0}
+.tally{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px 10px}
+.tallybox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.row1{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.big{font-family:var(--f-disp);font-weight:700;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.of{color:var(--muted);font-family:var(--f-mono);font-size:13px}
+.verdict{margin-left:auto;font-family:var(--f-disp);font-weight:600;font-size:17px;padding:4px 10px;border-radius:6px;border:1px solid currentColor}
+.verdict.yes{color:var(--good)} .verdict.no{color:var(--warn)}
+.bar{position:relative;height:22px;margin-top:12px;background:var(--bg);border:1px solid var(--line);border-radius:4px;display:flex;overflow:hidden}
+.bar i{display:block;height:100%;transition:width .25s}
+.mark{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--maj);left:calc(61/120*100%)}
+.marklbl{position:relative;height:16px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.marklbl span{position:absolute;left:calc(61/120*100%);transform:translateX(-50%);top:3px;white-space:nowrap}
+.flags{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.flags li{font-size:13px;color:var(--warn);padding-left:14px;position:relative}
+.flags li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.chip{font:500 13px var(--f-body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer}
+.chip:hover{border-color:var(--fg)} .chip:focus-visible,.party:focus-visible,.step:focus-visible{outline:2px solid var(--right);outline-offset:2px}
+.group{margin-top:22px}
+.ghead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--gc);padding-bottom:6px;margin-bottom:8px}
+.ghead h2{font-family:var(--f-disp);font-size:17px;font-weight:600;margin:0;color:var(--gc)}
+.ghead span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.party{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-left:5px solid var(--gc);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font:inherit}
+.party[aria-pressed="true"]{background:var(--gs);border-color:var(--gc)}
+.tick{flex:none;width:20px;height:20px;border:2px solid var(--line);border-radius:4px;display:grid;place-items:center;font-size:13px;line-height:1;color:transparent}
+.party[aria-pressed="true"] .tick{background:var(--gc);border-color:var(--gc);color:var(--panel)}
+.nm{flex:1;min-width:0}
+.nm b{display:block;font-weight:600}
+.nm small{color:var(--muted);font-size:12px}
+.seats{display:flex;align-items:center;gap:6px;flex:none}
+.num{font-family:var(--f-disp);font-weight:700;font-size:24px;min-width:34px;text-align:center;font-variant-numeric:tabular-nums}
+.step{font:600 16px var(--f-mono);width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;line-height:1}
+.note{margin-top:26px;font-size:12.5px;color:var(--muted);display:grid;gap:8px}
+.note a{color:var(--right)}
+@media (max-width:420px){.big{font-size:46px}.nm small{display:none}}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+
+.banner{background:#111;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.bin{max-width:760px;margin:0 auto;height:48px;display:flex;align-items:center;gap:12px}
+.logo{height:24px;width:auto;display:block}
+.bname{font:600 13px var(--f-body);letter-spacing:.12em;color:#c6f000}
+.bname b{font-weight:600}
+.bsrc{margin-left:auto;font:400 12px var(--f-body);color:#fff}
+@media (max-width:420px){.bname{display:none}}
+.add{margin-top:26px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.add h2{font:600 17px var(--f-disp);margin:0 0 10px}
+.add form{display:flex;flex-wrap:wrap;gap:8px}
+.add input,.add select{font:400 14px var(--f-body);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-width:0}
+.add input[name=n]{flex:2 1 140px}.add input[name=s]{flex:0 0 80px}.add select{flex:1 1 120px}
+.add button{font:600 14px var(--f-body);background:var(--fg);color:var(--bg);border:0;border-radius:6px;padding:8px 14px;cursor:pointer}
+.foot{margin-top:18px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+html{background:var(--bg)}body{margin:0}</style></head><body>
+<div class="banner"><div class="bin"><img class="logo" alt="Centile Partners" src="data:image/png;base64,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"><span class="bname">CENTILE <b>PARTNERS</b></span><span class="bsrc">Source: CEC, press reports</span></div></div>
+<div class="wrap">
+<header>
+  <h1>Knesset Coalition Builder</h1>
+  <p class="sub">26th Knesset · election 27 Oct 2026 · 120 seats, 61 needed · CEC count at 89.8%, not final</p>
+</header>
+
+<div class="tally">
+  <div class="tallybox">
+    <div class="row1">
+      <span class="big" id="total">0</span><span class="of">/ 120 seats</span>
+      <span class="verdict no" id="verdict">Short by 61</span>
+    </div>
+    <div class="bar" id="bar" aria-hidden="true"><span class="mark"></span></div>
+    <div class="marklbl"><span>61</span></div>
+    <ul class="flags" id="flags"></ul>
+  </div>
+</div>
+
+<div class="presets" id="presets"></div>
+
+<div id="groups"></div>
+
+<div class="note">
+  <p>Seats are the Central Elections Committee figures reported on 28 Oct (Times of Israel, Jerusalem Post, Ynet). About 430,000 to 480,000 double-envelope ballots (soldiers, prisoners, diplomats) were still to be counted from early Thursday. The CEC is expected to publish final official results on 4 November. Use the − and + buttons to change a party's seats as the count moves.</p>
+  <p>Flags show public statements reported after the vote, not formal positions: Eisenkot has rejected serving under Netanyahu, and every Zionist-bloc party except The Democrats has ruled out relying on Ra'am or the Joint List. Parties can and do change course in coalition talks. Under Israeli law the president picks the member best placed to form a government, who then has 28 days, extendable by 14.</p>
+</div>
+<section class="add"><h2>Add a party</h2><form id="addf"><input name="n" aria-label="Party name" placeholder="Party name" required maxlength="40"><input name="s" aria-label="Seats" type="number" min="0" max="120" value="4" required><select name="b" aria-label="Bloc"><option value="r">Netanyahu bloc</option><option value="o">Opposition bloc</option><option value="a">Arab parties</option></select><button type="submit">Add</button></form></section>
+<div class="foot"><span>Seats: CEC count at 89.8%, 28 Oct 2026. Final results due 4 Nov.</span><span>Source: CEC, press reports</span></div>
+</div>
+<script>
+var P=[
+ {id:"likud",n:"Likud",l:"Netanyahu",s:26,b:"r"},
+ {id:"shas",n:"Shas",l:"Deri",s:7,b:"r"},
+ {id:"utj",n:"United Torah Judaism",l:"Asher",s:7,b:"r"},
+ {id:"otzma",n:"Otzma Yehudit",l:"Ben Gvir",s:7,b:"r"},
+ {id:"rz",n:"Religious Zionism",l:"Smotrich",s:6,b:"r"},
+ {id:"yashar",n:"Yashar",l:"Eisenkot",s:21,b:"o"},
+ {id:"byachad",n:"B'Yachad",l:"Bennett",s:12,b:"o"},
+ {id:"dem",n:"The Democrats",l:"Golan",s:8,b:"o"},
+ {id:"yb",n:"Yisrael Beytenu",l:"Liberman",s:7,b:"o"},
+ {id:"jl",n:"Joint List",l:"Jabareen",s:12,b:"a"},
+ {id:"raam",n:"Ra'am",l:"Abbas",s:7,b:"a"}
+];
+var G={r:{t:"Netanyahu bloc",c:"--right",s:"--right-soft"},o:{t:"Opposition bloc (Eisenkot)",c:"--opp",s:"--opp-soft"},a:{t:"Arab parties",c:"--arab",s:"--arab-soft"}};
+var base={};P.forEach(function(p){base[p.id]=p.s});
+var sel={};
+var PRE=[
+ ["Netanyahu bloc",["likud","shas","utj","otzma","rz"]],
+ ["Opposition bloc",["yashar","byachad","dem","yb"]],
+ ["Opposition + Arab parties",["yashar","byachad","dem","yb","jl","raam"]],
+ ["Opposition + Ra'am",["yashar","byachad","dem","yb","raam"]],
+ ["Unity: Likud + Yashar",["likud","yashar"]],
+ ["Clear all",[]]
+];
+function by(id){return P.filter(function(p){return p.id===id})[0]}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function flags(){
+  var f=[],has=function(i){return sel[i]};
+  var right=["likud","shas","utj","otzma","rz"].some(has);
+  if(has("yashar")&&right) f.push("Eisenkot has rejected serving under Netanyahu, including in a rotation.");
+  var arab=has("jl")||has("raam");
+  var zion=["yashar","byachad","yb"].some(has);
+  if(arab&&zion) f.push("Yashar, B'Yachad and Yisrael Beytenu have ruled out relying on Ra'am or the Joint List. The Democrats are open to it.");
+  if(arab&&right) f.push("No party in the Netanyahu bloc has signalled cooperation with the Arab parties.");
+  return f;
+}
+function render(){
+  var tot=0;P.forEach(function(p){if(sel[p.id])tot+=p.s});
+  document.getElementById("total").textContent=tot;
+  var v=document.getElementById("verdict");
+  if(tot>=61){v.textContent="Majority +"+(tot-60);v.className="verdict yes"}
+  else{v.textContent=(61-tot)+" short";v.className="verdict no"}
+  var bar=document.getElementById("bar");
+  Array.prototype.slice.call(bar.querySelectorAll("i")).forEach(function(n){n.remove()});
+  var mk=bar.querySelector(".mark");
+  P.forEach(function(p){if(sel[p.id]&&p.s>0){var i=document.createElement("i");i.style.width=(p.s/120*100)+"%";i.style.background="var("+G[p.b].c+")";i.style.borderRight="1px solid var(--panel)";i.title=p.n+" "+p.s;bar.insertBefore(i,mk)}});
+  var fl=document.getElementById("flags");fl.textContent="";
+  flags().forEach(function(t){fl.appendChild(el("li",null,t))});
+  P.forEach(function(p){
+    var b=document.querySelector('[data-id="'+p.id+'"]');
+    b.setAttribute("aria-pressed",sel[p.id]?"true":"false");
+    b.querySelector(".num").textContent=p.s;
+  });
+  ["r","o","a"].forEach(function(g){
+    var s=0;P.forEach(function(p){if(p.b===g)s+=p.s});
+    document.getElementById("gs-"+g).textContent=s+" seats";
+  });
+}
+function build(){
+  var pr=document.getElementById("presets");
+  PRE.forEach(function(x){
+    var c=el("button","chip",x[0]);c.type="button";
+    c.onclick=function(){sel={};x[1].forEach(function(i){sel[i]=true});render()};
+    pr.appendChild(c);
+  });
+  var gr=document.getElementById("groups");
+  ["r","o","a"].forEach(function(g){
+    var d=el("section","group");d.style.setProperty("--gc","var("+G[g].c+")");d.style.setProperty("--gs","var("+G[g].s+")");
+    var h=el("div","ghead");h.appendChild(el("h2",null,G[g].t));var sp=el("span",null,"");sp.id="gs-"+g;h.appendChild(sp);d.appendChild(h);
+    P.filter(function(p){return p.b===g}).forEach(function(p){
+      var b=el("div","party");b.setAttribute("role","button");b.tabIndex=0;b.dataset.id=p.id;b.setAttribute("aria-pressed","false");
+      b.setAttribute("aria-label",p.n);
+      var t=el("span","tick","✓");
+      var nm=el("span","nm");nm.appendChild(el("b",null,p.n));nm.appendChild(el("small",null,p.l));
+      var se=el("span","seats");
+      var m=el("button","step","−");m.type="button";m.setAttribute("aria-label","Remove a seat from "+p.n);
+      var n=el("span","num",p.s);
+      var a=el("button","step","+");a.type="button";a.setAttribute("aria-label","Add a seat to "+p.n);
+      m.onclick=function(e){e.stopPropagation();if(p.s>0){p.s--;render()}};
+      a.onclick=function(e){e.stopPropagation();if(p.s<120){p.s++;render()}};
+      se.appendChild(m);se.appendChild(n);se.appendChild(a);
+      b.appendChild(t);b.appendChild(nm);b.appendChild(se);
+      var tg=function(){sel[p.id]=!sel[p.id];render()};
+      b.onclick=tg;
+      b.onkeydown=function(e){if((e.key==="Enter"||e.key===" ")&&e.target===b){e.preventDefault();tg()}};
+      d.appendChild(b);
+    });
+    gr.appendChild(d);
+  });
+  ["likud","shas","utj","otzma","rz"].forEach(function(i){sel[i]=true});
+  render();
+}
+build();
+document.getElementById("addf").addEventListener("submit",function(e){
+  e.preventDefault();var f=e.target,n=f.n.value.trim();if(!n)return;
+  var p={id:"c"+Date.now(),n:n,l:"Added",s:Math.max(0,Math.min(120,parseInt(f.s.value,10)||0)),b:f.b.value};
+  P.push(p);document.getElementById("groups").textContent="";document.getElementById("presets").textContent="";
+  var keep=sel;sel={};build();Object.keys(keep).forEach(function(k){sel[k]=keep[k]});sel[p.id]=true;render();f.n.value="";
+});
+</script></body></html>
