@@ -1,0 +1,224 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Midterms 2026 Odds Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one working column; summary strip, then Senate board + simulator, then House slider. */
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --fg:#17202b; --muted:#5b6675; --line:#dfe3e9;
+  --dem:#2f5fa7; --dem-soft:#dbe6f6; --rep:#b23a3a; --rep-soft:#f4dede; --ind:#7a6a2a;
+  --accent:#17202b;
+  --display:"Newsreader",Georgia,serif; --body:"Public Sans",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --panel:#18202a; --fg:#e7ebf0; --muted:#97a2b1; --line:#2a3542;
+  --dem:#79a3e6; --dem-soft:#1f3150; --rep:#e58080; --rep-soft:#4a2328; --ind:#cbb769; --accent:#e7ebf0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161d; --panel:#18202a; --fg:#e7ebf0; --muted:#97a2b1; --line:#2a3542;
+  --dem:#79a3e6; --dem-soft:#1f3150; --rep:#e58080; --rep-soft:#4a2328; --ind:#cbb769; --accent:#e7ebf0; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+h1{font-family:var(--display);font-size:clamp(28px,5vw,42px);line-height:1.1;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-size:24px;margin:0;text-wrap:balance}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lede{color:var(--muted);max-width:68ch;margin:6px 0 0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:4px}
+.stat b{font-family:var(--mono);font-size:24px;font-weight:600}
+.stat small{color:var(--muted);font-size:12.5px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:16px;min-width:0}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:end}
+.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+label{font-size:13px;color:var(--muted);display:grid;gap:4px}
+input[type=range]{width:220px;max-width:100%;accent-color:var(--accent)}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--dem);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.r{text-align:right}
+.held{font-size:11px;font-weight:600;padding:1px 6px;border-radius:4px}
+.held.D{background:var(--dem-soft);color:var(--dem)} .held.R{background:var(--rep-soft);color:var(--rep)}
+.bar{height:8px;border-radius:4px;background:var(--rep);position:relative;overflow:hidden;min-width:90px}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--dem)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:4px 8px;background:transparent;font-size:12px}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.src{font-size:11px;color:var(--muted)}
+.big{font-family:var(--mono);font-size:44px;font-weight:600;line-height:1}
+.outcomes{display:grid;gap:8px}
+.oc{display:grid;grid-template-columns:150px 1fr 52px 52px;gap:8px;align-items:center;font-size:13px}
+.oc .track{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.oc .track i{display:block;height:100%;background:var(--fg)}
+.oc .pm{color:var(--muted)}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:10px}
+.note{font-size:12.5px;color:var(--muted);max-width:75ch}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+footer{font-size:12px;color:var(--muted);display:grid;gap:6px}
+footer a{color:var(--muted)}
+@media (max-width:480px){.oc{grid-template-columns:110px 1fr 44px 44px}.big{font-size:36px}}
+.banner{background:#111111;color:#ffffff;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.banner .in{max-width:1040px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.banner img{height:26px;width:auto;display:block}
+.banner span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#c6f000;font-weight:600}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#111111}
+</style>
+<style>body{margin:0}</style></head><body>
+
+<div class="banner"><div class="in"><img alt="Centile Partners" src="data:image/png;base64,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"><span>Centile Partners · US Midterms 2026</span></div></div>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">US midterms · Tue 3 Nov 2026 · data as of 30 Oct</div>
+    <h1>Who controls Congress? Build your own map</h1>
+    <p class="lede">Start from Polymarket prices for the competitive Senate races, lock in the results you believe, and shift the national environment. The simulator re-runs 20,000 correlated elections on every change.</p>
+  </header>
+
+  <section class="strip" aria-label="Headline numbers">
+    <div class="stat"><span class="eyebrow">Polymarket · House</span><b class="num" style="color:var(--dem)">D 94%</b><small>Senate D 69% · sweep 69%</small></div>
+    <div class="stat"><span class="eyebrow">Generic ballot</span><b class="num" style="color:var(--dem)">D +8.2</b><small>RCP avg; FiftyPlusOne D+9, DDHQ D+8.1</small></div>
+    <div class="stat"><span class="eyebrow">Models · Senate D</span><b class="num">58–68%</b><small>DDHQ 60%, Poliwave 58%, Manuel 68%</small></div>
+    <div class="stat"><span class="eyebrow">Trump approval</span><b class="num">36%</b><small>Avg approve, ~61% disapprove</small></div>
+  </section>
+
+  <section class="panel" aria-labelledby="sen">
+    <div class="head">
+      <div><div class="eyebrow">Senate · 53R–47D today · D needs 51 (VP breaks ties for R)</div><h2 id="sen">Senate simulator</h2></div>
+      <div class="controls">
+        <label for="swing">National polling error: <span class="num" id="swingv">0.0</span> pts
+          <input id="swing" type="range" min="-6" max="6" step="0.5" value="0"></label>
+        <button id="reset">Reset to market</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>State</th><th>Matchup (D v R)</th><th>D win</th><th class="r">%</th><th>Set</th></tr></thead>
+          <tbody id="races"></tbody>
+        </table>
+        <p class="src">PM = Polymarket price. est. = no market price found; estimated from polling average or a model and marked as such. Other seats treated as safe: 43 D, 45 R (Nebraska counted R; an independent there is a known wildcard).</p>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start;min-width:0">
+        <div><div class="eyebrow">Democratic Senate control</div><div class="big" id="pSen">–</div><div class="src" id="median"></div></div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">Distribution of Democratic seats</div>
+          <svg id="hist" viewBox="0 0 360 150" width="100%" role="img" aria-label="Histogram of simulated Democratic Senate seats"></svg>
+          <div class="legend"><span><span class="sw" style="background:var(--dem)"></span>D control (≥51)</span><span><span class="sw" style="background:var(--rep)"></span>R control</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="hou">
+    <div class="head">
+      <div><div class="eyebrow">House · 218 for majority</div><h2 id="hou">House and balance of power</h2></div>
+      <div class="controls">
+        <label for="gb">Generic ballot (D margin): <span class="num" id="gbv">+8.2</span>
+          <input id="gb" type="range" min="-4" max="14" step="0.1" value="8.2"></label>
+      </div>
+    </div>
+    <div class="grid2">
+      <div><div class="eyebrow">Democratic House control</div><div class="big" id="pHouse">–</div>
+        <p class="note">Rule of thumb from the published models: Democrats need roughly D+3 to D+4 nationally to be favoured for the House after redistricting. Here the threshold is D+3 with a 3.5-pt national error, and the national error is shared with the Senate races.</p></div>
+      <div>
+        <div class="oc" style="color:var(--muted);font-size:11px"><span></span><span></span><span>Sim</span><span>PM</span></div>
+        <div class="outcomes" id="bop"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Sources: Polymarket (Balance of Power, Senate, House and state markets), RealClearPolling, FiftyPlusOne, Decision Desk HQ, Silver Bulletin, Poliwave, CNN and Yahoo poll roundups, 26–30 Oct 2026.</div>
+    <div>Method: each race's market price is turned into an expected margin (probit × 4 pts). Every simulation draws one national error (σ 2.5 pts, plus your slider) and a race error (σ 3.1 pts). Illustrative tool, not a forecast.</div>
+    <div>Centile Partners · Carlos Climent. For professional clients only; not an offer or recommendation.</div>
+  </footer>
+</div>
+
+<script>
+const races=[
+ {st:"GA",held:"D",m:"Ossoff v Collins",p:95,src:"PM"},
+ {st:"MN",held:"D",m:"Flanagan v Tafoya",p:85,src:"est. poll D+5.1"},
+ {st:"NH",held:"D",m:"Pappas v Sununu",p:80,src:"est. poll D+6.7"},
+ {st:"MI",held:"D",m:"El-Sayed v Rogers",p:72,src:"PM"},
+ {st:"NC",held:"R",m:"Cooper v Whatley",p:90,src:"est. poll D+11"},
+ {st:"OH",held:"R",m:"Brown v Husted",p:71,src:"PM"},
+ {st:"TX",held:"R",m:"Talarico v Paxton",p:71,src:"PM"},
+ {st:"AK",held:"R",m:"Peltola v Sullivan",p:70,src:"PM"},
+ {st:"ME",held:"R",m:"Jackson v Collins",p:67,src:"PM"},
+ {st:"KS",held:"R",m:"Hamilton v Marshall",p:50,src:"PM"},
+ {st:"IA",held:"R",m:"Turek v Hinson",p:46,src:"PM"},
+ {st:"SC",held:"R",m:"D v Graham Nordone",p:30,src:"est. DDHQ R 70%"},
+ {st:"FL",held:"R",m:"D v Moody",p:10,src:"PM"}
+];
+const SAFE_D=43, N=20000, SIG_R=4, SIG_N=2.5, SIG_I=Math.sqrt(SIG_R*SIG_R-SIG_N*SIG_N);
+const PM={sweepD:69,split:25,sweepR:7,odd:1,house:94,senate:69};
+races.forEach(r=>r.lock=0); // 0 market, 1 D, -1 R
+
+function invPhi(p){p=Math.min(Math.max(p,1e-4),1-1e-4);const a=[-39.696830,220.946098,-275.928510,138.357751,-30.664798,2.506628],b=[-54.476098,161.585836,-155.698979,66.801311,-13.280681],c=[-0.007784894,-0.32239645,-2.400758,-2.549732,4.374664,2.938163],d=[0.007784695,0.32246712,2.445134,3.754408];
+ const pl=.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}
+ if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}
+ q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)}
+// seeded RNG so results don't jitter between identical runs
+function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function gauss(u){return()=>{let a=u()||1e-9,b=u();return Math.sqrt(-2*Math.log(a))*Math.cos(2*Math.PI*b)}}
+
+const $=id=>document.getElementById(id);
+function renderTable(){
+ $("races").innerHTML=races.map((r,i)=>`<tr>
+  <td><span class="held ${r.held}">${r.st}</span></td>
+  <td>${r.m}<div class="src">${r.src}</div></td>
+  <td><div class="bar" aria-hidden="true"><i style="width:${r.p}%"></i></div></td>
+  <td class="r num">${r.p}</td>
+  <td><div class="seg" role="group" aria-label="${r.st} outcome">
+   <button data-i="${i}" data-v="0" aria-pressed="${r.lock===0}">Mkt</button>
+   <button data-i="${i}" data-v="1" aria-pressed="${r.lock===1}">D</button>
+   <button data-i="${i}" data-v="-1" aria-pressed="${r.lock===-1}">R</button></div></td></tr>`).join("");
+}
+$("races").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(!b)return;races[+b.dataset.i].lock=+b.dataset.v;renderTable();run()});
+
+function run(){
+ const swing=+$("swing").value, gb=+$("gb").value;
+ $("swingv").textContent=(swing>0?"D +":swing<0?"R +":"")+Math.abs(swing).toFixed(1);
+ $("gbv").textContent=(gb>=0?"+":"")+gb.toFixed(1);
+ const mu=races.map(r=>invPhi(r.p/100)*SIG_R);
+ const g=gauss(rng(12345));
+ const hist={};let dSen=0,dHouse=0,o={sweepD:0,split:0,sweepR:0,odd:0};
+ for(let k=0;k<N;k++){
+  const en=g()*SIG_N; let seats=SAFE_D;
+  for(let i=0;i<races.length;i++){const r=races[i];
+   if(r.lock===1)seats++;else if(r.lock===-1){}else if(mu[i]+swing+en+g()*SIG_I>0)seats++;}
+  hist[seats]=(hist[seats]||0)+1;
+  const s=seats>=51, h=(gb+swing+en*1.4-3)>0;
+  if(s)dSen++; if(h)dHouse++;
+  if(s&&h)o.sweepD++;else if(!s&&h)o.split++;else if(!s&&!h)o.sweepR++;else o.odd++;
+ }
+ $("pSen").textContent=Math.round(dSen/N*100)+"%";
+ $("pSen").style.color=dSen/N>=.5?"var(--dem)":"var(--rep)";
+ $("pHouse").textContent=Math.round(dHouse/N*100)+"%";
+ $("pHouse").style.color=dHouse/N>=.5?"var(--dem)":"var(--rep)";
+ let cum=0,med=0;for(let s=40;s<=60;s++){cum+=hist[s]||0;if(cum>=N/2){med=s;break}}
+ $("median").textContent=`Median outcome: ${med} D – ${100-med} R · Polymarket Senate D ${PM.senate}%`;
+ drawHist(hist);
+ const lab={sweepD:"Democrats sweep",split:"D House, R Senate",sweepR:"Republicans sweep",odd:"R House, D Senate"};
+ $("bop").innerHTML=Object.keys(lab).map(k=>{const v=Math.round(o[k]/N*100);return`<div class="oc"><span>${lab[k]}</span><span class="track"><i style="width:${v}%"></i></span><span class="num">${v}%</span><span class="num pm">${PM[k]}%</span></div>`}).join("");
+}
+function drawHist(h){
+ const lo=43,hi=56,W=360,H=150,pl=8,pb=22,bw=(W-2*pl)/(hi-lo+1);
+ const max=Math.max(...Object.values(h),1);let out="";
+ for(let s=lo;s<=hi;s++){const v=h[s]||0,bh=(H-pb-14)*v/max,x=pl+(s-lo)*bw;
+  out+=`<rect x="${x+1}" y="${H-pb-bh}" width="${bw-2}" height="${bh}" fill="${s>=51?"var(--dem)":"var(--rep)"}" opacity=".85"></rect>`;
+  out+=`<text x="${x+bw/2}" y="${H-8}" text-anchor="middle">${s}</text>`;
+  if(v/N>=.06)out+=`<text x="${x+bw/2}" y="${H-pb-bh-3}" text-anchor="middle">${Math.round(v/N*100)}</text>`;}
+ const x51=pl+(51-lo)*bw;out+=`<line x1="${x51}" x2="${x51}" y1="4" y2="${H-pb}" stroke="var(--fg)" stroke-dasharray="3 3" stroke-width="1"></line>`;
+ $("hist").innerHTML=out;
+}
+["swing","gb"].forEach(id=>$(id).addEventListener("input",run));
+$("reset").addEventListener("click",()=>{races.forEach(r=>r.lock=0);$("swing").value=0;$("gb").value=8.2;renderTable();run()});
+renderTable();run();
+</script>
+</body></html>
